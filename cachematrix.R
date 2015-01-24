@@ -1,33 +1,36 @@
-## Put comments here that give an overall description of what your
-## functions do
-
-## Write a short comment describing this function
-
-makeCacheMatrix <- function(x = matrix()) {
-  inversematrix <- NULL                              
-   
-  set <- function(y){ x <<- y; inversematrix <<- NULL }
-  get <- function() { x }                            
-  setinverse <- function(y) { inversematrix <<- y }  
-  getinverse <- function() { inversematrix }           
- 
-  list(set = set,                                         
-       get = get, 
-       setinverse = setinverse, 
-       getinverse = getinverse)
+makeCacheMatrix <- function( x = matrix() )
+{
+  i  <- NULL    # set up LOCAL i as NULL for sure it will hold inverse matrix
+  set  <- function(y)
+  {
+    x <<- y    ## copy data from entry matrix "y" into GLOBAL martix "x"
+    i <<- NULL ## set up GLOBAL i as NULL for sure we did not invert the GLOBAL matrix "x" yet
+  }
+  get  <- function() { x }  # returns original matrix
+  setinverse  <- function(inverse) 
+  {
+    i  <<- inverse # "inverse" is an entry matrix that we calculate as inversed 
+                   # and copy its data into GLOBAL matrix "i"
+  }
   
+  getinverse  <- function() { i } # returns inversed matrix 
+  
+  list(set= set, get = get, 
+       getinverse = setinverse, 
+       getinverse = getinverse)
 }
 
-## Write a short comment describing this function
-cacheSolve <- function(x, ...) {
-
-  m <- x$getinverse()
-  if(!is.null(m)) {
-    message("getting cashed data")
-    return(m)
+cacheSolve <- function(x, ...) # same matrix (GLOBAL object) comes into the function to be processed
+{
+  copy_of_i  <- x$getinverse() # gets data from GLOBAL matrix "i" into local varaible
+  
+  if ( !is.null( copy_of_i ) ) # if it has not NULL data, so it is already processed  
+  {
+    message("getting cached data")
+    return(i)
   }
-  data <- x$get()
-  m <- solve(data, ...)
-  x$setinverse(m)
-  m
+  original_entry_x  <- x$get()                 # gets data from GLOBAL original matrix "x" into local matrix "i"
+  inversed_entry_x  <- solve(original_entry_x,...) # solve() function inverses matrix
+  x$setinverse(inversed_entry_x)               # sets up GLOBAL inversed matrix "i"
+  x$getinverse()
 }
